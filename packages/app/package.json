@@ -1,0 +1,24 @@
+{
+  "name": "@amoretto/app",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "license": "MIT",
+  "private": true,
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "scripts": {
+    "build": "webpack --config ./webpack.config.js --display errors-only",
+    "start": "webpack-dev-server --config ./webpack.config.js"
+  },
+  "devDependencies": {
+    "graphql-tag": "^2.10.3"
+  },
+  "dependencies": {
+    "@amoretto/action-graph": "1.0.0",
+    "@apollo/client": "^3.0.0-beta.44",
+    "graphql": "^14.5.4",
+    "react": "^16.13.1",
+    "react-dom": "^16.13.1"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "@amoretto/action-graph",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "license": "MIT",
+  "private": true,
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "scripts": {
+    "build": "webpack --config ./webpack.config.js --display errors-only",
+    "start": "echo start-storybook"
+  },
+  "dependencies": {
+    "rxjs": "^6.5.5",
+    "@types/uuid": "^8.0.0",
+    "uuid": "^8.1.0"
+  }
+}
