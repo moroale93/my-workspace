@@ -10,9 +10,11 @@ interface GraphChanges {
 
 export default class Graph extends Observable<GraphChanges> {
     public statusManager: StatusManager;
+    public name: string;
 
-    constructor() {
+    constructor(name: string) {
         super();
+        this.name = name;
         this.statusManager = new StatusManager();
     }
 
@@ -21,7 +23,7 @@ export default class Graph extends Observable<GraphChanges> {
             complete: () => this.subject.next({ nodeDeleted: action.id }),
         })
         this.statusManager.observeAction(action);
-        new NodeExecutor(action);
+        new NodeExecutor(action, this.name);
         this.subject.next({ nodeAdded: action.id })
     }
 }

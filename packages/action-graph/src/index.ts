@@ -5,6 +5,6 @@ import ActionStore from './ActionStore';
 
 export default GraphStore;
 export {
-    Action,
-    ActionStore,
+  Action,
+  ActionStore,
 };

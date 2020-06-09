@@ -8,7 +8,7 @@ export default class GraphStore {
 
     public getGraph(graphName: string): Graph {
         if (!this.graphs[graphName]) {
-            this.graphs[graphName] = new Graph();
+            this.graphs[graphName] = new Graph(graphName);
         }
         return this.graphs[graphName];
     }

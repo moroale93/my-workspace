@@ -24,7 +24,6 @@ function getNodes(nodeDeleted) {
 
 export default function GraphDisplayer({ name }) {
   const [nodes, setNodes] = useState(getNodes());
-  console.log(nodes);
   useEffect(() => {
     GraphStore.getInstance().getGraph(name).subject.subscribe({
       next: ({ nodeDeleted }) => setNodes(getNodes(nodeDeleted)),
