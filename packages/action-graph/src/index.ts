@@ -1,8 +1,10 @@
 /* istanbul ignore file */
-import Graph from './Graph';
+import GraphStore from './GraphStore';
 import Action from './Action';
+import ActionStore from './ActionStore';
 
-export default Graph;
+export default GraphStore;
 export {
-    Action
-}
+    Action,
+    ActionStore,
+};

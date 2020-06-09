@@ -2,7 +2,7 @@ import Action from "./Action";
 import TagManager from './TagManager';
 
 export default class ActionStore {
-    private static instance: ActionStore;
+    private static instances: { [key: string]: ActionStore } = {};
     private tagManager: TagManager;
     private actions: {[key: string]: Action} = {};
 
@@ -10,11 +10,11 @@ export default class ActionStore {
         this.tagManager = new TagManager();
     }
 
-    public static getInstance(): ActionStore {
-        if (!ActionStore.instance) {
-            ActionStore.instance = new ActionStore();
+    public static getInstance(graphName: string): ActionStore {
+        if (!ActionStore.instances[graphName]) {
+            ActionStore.instances[graphName] = new ActionStore();
         }
-        return ActionStore.instance;
+        return ActionStore.instances[graphName];
     }
 
     public addAction(action: Action): void {
@@ -41,8 +41,8 @@ export default class ActionStore {
             },{}));
     }
 
-    public reset() {
+    public reset(graphName: string) {
         // made for testing purpose
-        delete ActionStore.instance;
+        delete ActionStore.instances[graphName];
     }
 }

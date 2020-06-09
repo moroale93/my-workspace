@@ -1,0 +1,30 @@
+svg {
+    font-family: monospace;
+}
+
+.node circle {
+    fill: lightgray;
+    stroke: black;
+    stroke-opacity: 0.5;
+    cursor: pointer;
+
+    &.error {
+        fill: #f53434;
+    }
+    
+    &.active {
+        fill: #06c2ff;
+    }
+}
+
+.node text {
+    text-anchor: middle;
+}
+
+.node .delete-icon {
+    cursor: pointer;
+    padding-left: 50px;
+    opacity: 0.8;
+}
+
+.link { stroke: #999; stroke-opacity: .6; stroke-width: 2px; }

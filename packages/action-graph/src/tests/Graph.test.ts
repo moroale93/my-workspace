@@ -96,4 +96,37 @@ describe('Graph', () => {
 
 		graph.statusManager.subject.unsubscribe();
 	});
+
+	it('notifies on graph changes', async () => {
+		const graph = new Graph();
+		const graphChangesMock = jest.fn();
+		graph.subject.subscribe({
+			next: graphChangesMock,
+		});
+		const command = jest.fn().mockResolvedValue('Ciao');
+		const action = new Action(['ADD'], [], command);
+		const command2 = jest.fn().mockResolvedValue('Ciao');
+		const action2 = new Action([], ['ADD'], command2);
+		graph.addNode(action);
+		graph.addNode(action2);
+
+		await wait(0);
+		await wait(0);
+
+		expect(graphChangesMock).toHaveBeenCalledTimes(4);
+		expect(graphChangesMock).toHaveBeenNthCalledWith(1, {
+			nodeAdded: action.id,
+		});
+		expect(graphChangesMock).toHaveBeenNthCalledWith(2, {
+			nodeAdded: action2.id,
+		});
+		expect(graphChangesMock).toHaveBeenNthCalledWith(3, {
+			nodeDeleted: action.id,
+		});
+		expect(graphChangesMock).toHaveBeenNthCalledWith(4, {
+			nodeDeleted: action2.id,
+		});
+
+		graph.subject.unsubscribe();
+	});
 });
