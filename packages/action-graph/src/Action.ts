@@ -5,6 +5,7 @@ import Observable from './Observable';
 export interface ActionChange {
     actionId: string
     error?: any
+    result?: any
 }
 
 export default class Action extends Observable<ActionChange> {
@@ -28,7 +29,13 @@ export default class Action extends Observable<ActionChange> {
             actionId: this.id,
         });
         this.command()
-            .then(() => this.subject.complete())
+            .then(result => {
+                this.subject.next({
+                    actionId: this.id,
+                    result,
+                });
+                this.subject.complete();
+            })
             .catch(e => this.subject.next({
                actionId: this.id,
                error: e,

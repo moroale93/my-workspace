@@ -18,13 +18,12 @@ export default class StatusManager extends Observable<StateChange> {
         }
         this.actions += 1;
         action.subject.subscribe({
-            next: value => this.onActionChanged(value),
-            complete: () => this.onActionCompleted(action),
+            next: value => this.onActionChanged(action, value),
         });
         return true;
     }
 
-    private onActionChanged({ error, actionId }: ActionChange): void {
+    private onActionChanged(action: Action, { error, result, actionId }: ActionChange): void {
         const previousStatus = this.status;
         if (error) {
             this.errors[actionId] = error;
@@ -33,6 +32,10 @@ export default class StatusManager extends Observable<StateChange> {
             return;
         }
         delete this.errors[actionId];
+        if (result) {
+            this.onActionCompleted(action);
+            return;
+        }
         if (!Object.keys(this.errors).length) {
             this.status = Status.PENDING;
             this.notifyObservers(previousStatus);

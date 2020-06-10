@@ -39,21 +39,31 @@ describe('Action', () => {
 		action.execute();
 		await wait(0);
 
-		expect(nextMock).toHaveBeenCalledTimes(1);
+		expect(nextMock).toHaveBeenCalledTimes(2);
+		expect(nextMock).toHaveBeenNthCalledWith(1, {
+			actionId: action.id,
+		});
+		expect(nextMock).toHaveBeenNthCalledWith(2, {
+			actionId: action.id,
+			result: 'Ciao',
+		});
 		expect(completeMock).toHaveBeenCalledTimes(1);
 	});
 
 	it('notifies on action error', async () => {
+		const completeMock = jest.fn();
 		const nextMock = jest.fn();
 		const command = jest.fn().mockRejectedValue('Error');
 		const action = new Action(tags, dependencyTags, command);
 		action.subject.subscribe({
 			next: nextMock,
+			complete: completeMock,
 		});
 
 		action.execute();
 		await wait(0);
 
+		expect(completeMock).toHaveBeenCalledTimes(0);
 		expect(nextMock).toHaveBeenCalledTimes(2);
 		expect(nextMock).toHaveBeenCalledWith({
 			actionId: 'uuid',
