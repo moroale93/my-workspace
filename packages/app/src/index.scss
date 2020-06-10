@@ -1,5 +1,25 @@
-@import './components/GraphDisplayer';
-
-html, body {
-    margin: 0;
+.App {
+    font-family: sans-serif;
 }
+
+body > iframe {
+    display: none !important;
+}
+
+.element--optimistic-ui {
+    color: blue;
+}
+
+.status {
+    &-complete {
+        color: green;
+    }
+
+    &-error {
+        color: red;
+    }
+
+    &-pending {
+        color: blue;
+    }
+} 
