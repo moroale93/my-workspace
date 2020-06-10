@@ -42,6 +42,8 @@ class QueueLink extends ApolloLink {
     const { query } = operation;
     const isQueuedQuery = hasDirectives([DIRECTIVE_NAME], query);
 
+    // TODO  this is on for the rest, but if we want to evaluate its status it must pass trough the graph! even if it's an orphan node
+    // this means that we need an annotation that point out this thing
     if (!isQueuedQuery) {
       return forward(operation);
     }
