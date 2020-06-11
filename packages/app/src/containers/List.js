@@ -21,7 +21,7 @@ const GET_LIST = gql`
 `;
 
 const ADD_ELEMENT = gql`
-  mutation AddElement($input: CreateElementInput!) @action(tags: ["STRUCTURE", { selector: "input.id" }], dependencies: ["STRUCTURE", { selector: "input.id" }]) {
+  mutation AddElement($input: CreateElementInput!) @action(tags: ["STRUCTURE", { selector: "input.id" }], dependencies: ["STRUCTURE"]) {
     addElement(input: $input) {
       id
       elements {
