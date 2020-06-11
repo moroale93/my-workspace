@@ -14,6 +14,7 @@ An example of user interaction can be:
 
 In this the graph of dependency is the following:
 ![graph example](./documentationAssets/GraphExample.png)
+
 In the picture, the blue labels are the tags to identify the actions and the red ones the dependencies.
 
 ### How to use
@@ -38,3 +39,9 @@ In general, Actions, Graphs and StatusManager can be observed.
 ### Architecture and responsability of each component
 
 ![class diagram](./documentationAssets/ClassDiagram.png)
+
+### Sequence diagrams
+
+How addition and execution of a node works:
+
+![class diagram](./documentationAssets/AddAction.png)
