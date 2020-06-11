@@ -7,7 +7,7 @@ const typeDefs = gql`
     optimisticUi: Boolean!
   }
 
-  directive @queue(
+  directive @action(
     name: String!,
   ) on OBJECT | FIELD_DEFINITION
 `;

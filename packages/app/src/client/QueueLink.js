@@ -2,16 +2,28 @@ import { ApolloLink } from '@apollo/client';
 import { checkDocument, removeDirectivesFromDocument, hasDirectives, getOperationDefinition } from '@apollo/client/utilities';
 import { Observable } from 'zen-observable-ts';
 import GraphStore, { Action } from '@amoretto/action-graph';
+import _ from 'lodash';
 
-const DIRECTIVE_NAME = 'queue';
+const DIRECTIVE_NAME = 'action';
 
-function getDirectiveOptions(directiveName, { directives }) {
+function transformValue(value, variables) {
+  if (value.block === false) {
+    return value.value;
+  }
+  if (value.fields[0].name.value === 'selector') {
+    return _.get(variables, value.fields[0].value.value);
+  }
+}
+
+function getDirectiveOptions(directiveName, { directives }, variables) {
   if (!directives) {
     return {};
   }
   const directive = directives.find(({ name }) => name.value === directiveName);
   const args = directive
-    ? directive.arguments.map(({ name, value }) => ({ [name.value]: value.value }))
+    ? directive.arguments.map(({ name, value }) => ({
+      [name.value]: value.values.map(value => transformValue(value, variables)),
+    }))
     : [];
   return args.reduce((map, arg) => ({ ...map, ...arg }), {});
 }
@@ -39,38 +51,41 @@ class QueueLink extends ApolloLink {
   }
 
   request(operation, forward) {
-    const { query } = operation;
-    const isQueuedQuery = hasDirectives([DIRECTIVE_NAME], query);
+    const { query, variables } = operation;
+    const isQueryWithDependencies = hasDirectives([DIRECTIVE_NAME], query);
 
-    // TODO  this is on for the rest, but if we want to evaluate its status it must pass trough the graph! even if it's an orphan node
-    // this means that we need an annotation that point out this thing
-    if (!isQueuedQuery) {
+    if (!isQueryWithDependencies) {
       return forward(operation);
     }
-
     const cleanedQuery = this.removeDirectiveFromDocument(query);
     operation.query = cleanedQuery;
-    const { name } = getDirectiveOptions(DIRECTIVE_NAME, getOperationDefinition(query));
+    const {
+      tags,
+      dependencies,
+    } = getDirectiveOptions(DIRECTIVE_NAME, getOperationDefinition(query), variables);
+    const blockingErrors = false;
 
     return new Observable(observer => {
       const command = () => new Promise((resolve, reject) => {
-        console.log('Start operation ', operation.operationName, operation.variables.input.text);
-
         forward(operation).subscribe({
           next: result => {
-            console.log('Operation next', result, operation.operationName, operation.variables.input.text);
+            if (result.errors) {
+              return reject(result);
+            }
             resolve(result);
           },
           error: error => {
-            console.log('Operation error', operation.operationName, operation.variables.input.text);
             reject(error);
-          }, // TODO adapt this, otherwise on error it will block everything
+          },
         });
       });
-      const action = new Action([name], [name], command);
+      const action = new Action(tags, dependencies, command, blockingErrors);
       action.subject.subscribe({
         complete: () => observer.complete && observer.complete(),
         next: ({ error, result }) => {
+          if (error?.errors) {
+            return !blockingErrors && observer.next(result);
+          }
           if (error && observer.error) {
             return observer.error(error);
           }

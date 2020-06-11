@@ -21,7 +21,7 @@ const GET_LIST = gql`
 `;
 
 const ADD_ELEMENT = gql`
-  mutation AddElement($input: CreateElementInput!) @queue(name: "elements") {
+  mutation AddElement($input: CreateElementInput!) @action(tags: ["STRUCTURE", { selector: "input.id" }], dependencies: ["STRUCTURE", { selector: "input.id" }]) {
     addElement(input: $input) {
       id
       elements {
@@ -34,7 +34,7 @@ const ADD_ELEMENT = gql`
 `;
 
 const MODIFY_ELEMENT = gql`
-  mutation ModifyElement($id: Int!, $input: ModifyElementInput!) @queue(name: "elements") {
+  mutation ModifyElement($id: Int!, $input: ModifyElementInput!) @action(tags: [{ selector: "id" }], dependencies: [{ selector: "id" }]) {
     modifyElement(id: $id, input: $input) {
       id
       text

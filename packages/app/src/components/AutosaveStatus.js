@@ -7,7 +7,9 @@ export default function AutosaveStatus() {
   useEffect(() => {
     const statusManagerObservable = GraphStore.getInstance().getGraph('test').statusManager.subject;
     statusManagerObservable.subscribe({
-      next: ({ status }) => setStatus(status),
+      next: ({ status }) => {
+        setStatus(status);
+      },
     });
     return () => {
       statusManagerObservable.unsubscribe();

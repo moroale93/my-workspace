@@ -14,14 +14,16 @@ export default class Action extends Observable<ActionChange> {
     readonly tags: string[];
     public blockingActionIds: string[];
     private command: () => Promise<any>;
+    private blockingErrors: boolean;
 
-    constructor(tags: string[], dependencyTags: string[], command: () => Promise<any>) {
+    constructor(tags: string[], dependencyTags: string[], command: () => Promise<any>, blockingErrors: boolean = true) {
         super();
         this.id = uuidv4();
         this.dependencyTags = dependencyTags;
         this.tags = tags;
         this.blockingActionIds = [];
         this.command = command;
+        this.blockingErrors = blockingErrors;
     }
 
     public execute(): void {
@@ -36,9 +38,14 @@ export default class Action extends Observable<ActionChange> {
                 });
                 this.subject.complete();
             })
-            .catch(e => this.subject.next({
-               actionId: this.id,
-               error: e,
-            }));
+            .catch(e => {
+                this.subject.next({
+                    actionId: this.id,
+                    error: e,
+                });
+                if (!this.blockingErrors) {
+                    this.subject.complete();
+                }
+            });
     }
 }
