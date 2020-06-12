@@ -63,39 +63,38 @@ class QueueLink extends ApolloLink {
       tags,
       dependencies,
     } = getDirectiveOptions(DIRECTIVE_NAME, getOperationDefinition(query), variables);
-    const blockingErrors = false;
 
     return new Observable(observer => {
       const command = () => new Promise((resolve, reject) => {
         forward(operation).subscribe({
-          next: result => {
-            if (result.errors) {
-              return reject(result);
-            }
-            resolve(result);
-          },
-          error: error => {
-            reject(error);
-          },
+          next: resolve,
+          error: reject,
         });
       });
-      const action = new Action(tags, dependencies, command, blockingErrors);
-      action.subject.subscribe({
-        complete: () => observer.complete && observer.complete(),
+      const action = new Action(tags, dependencies, command);
+      const subscription = action.subject.subscribe({
+        complete: result => observer.complete && observer.complete(result),
         next: ({ error, result }) => {
-          if (error?.errors) {
-            return !blockingErrors && observer.next(result);
-          }
-          if (error && observer.error) {
-            return observer.error(error);
+          if (result?.errors) {
+            console.log('ERROR ON THE QUERY\'S RESULT');
+            return observer.next(result);
           }
           if (result && observer.next) {
+            console.log('SUCCESS');
             return observer.next(result);
+          }
+          if (error && observer.error) {
+            console.log('GENERAL ERROR');
+            return observer.error(error);
           }
         },
       });
       GraphStore.getInstance().getGraph('test').addNode(action);
-      return () => {};
+      return () => {
+        if (!subscription.closed) {
+          subscription.unsubscribe();
+        }
+      };
     });
   }
 }
