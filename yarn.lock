@@ -2,6 +2,21 @@
 # yarn lockfile v1
 
 
+"@apollo/client@^3.0.0-beta.23":
+  version "3.0.0-rc.4"
+  resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.0.0-rc.4.tgz#20f621c5213550c1f6c3ab0018959c41b07ea246"
+  integrity sha512-hIs+C+i+qVQCkYbXUA0f+df2hC+0I8u5P38B4Ax5gOKh2gT1ZuYoFgz2EWrVZJf4fW6OUxqXLrPRnlG/SLq0rg==
+  dependencies:
+    "@types/zen-observable" "^0.8.0"
+    "@wry/equality" "^0.1.9"
+    fast-json-stable-stringify "^2.0.0"
+    graphql-tag "^2.10.2"
+    optimism "^0.12.1"
+    symbol-observable "^1.2.0"
+    ts-invariant "^0.4.4"
+    tslib "^1.10.0"
+    zen-observable "^0.8.14"
+
 "@apollo/client@^3.0.0-rc.1":
   version "3.0.0-rc.2"
   resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.0.0-rc.2.tgz#2534eac9d430200f795a3849c187a7a1a946f90d"
@@ -16,6 +31,14 @@
     ts-invariant "^0.4.4"
     tslib "^1.10.0"
     zen-observable "^0.8.14"
+
+"@apollo/link-retry@^2.0.0-beta.3":
+  version "2.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/@apollo/link-retry/-/link-retry-2.0.0-beta.3.tgz#9583e9bfb77ed5282965929a01a91071cc90b8fb"
+  integrity sha512-MCCOzlmOJrkiP8Ez/cCqOu0Irgq6LqWW+GEWYRTc0zdPj2oZyqS2PVvYB+u2MHDiUHmFxG6EgHmV4Q8FgzWkWg==
+  dependencies:
+    "@apollo/client" "^3.0.0-beta.23"
+    tslib "^1.9.3"
 
 "@apollo/protobufjs@^1.0.3":
   version "1.0.4"

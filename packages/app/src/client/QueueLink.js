@@ -2,6 +2,7 @@ import { ApolloLink } from '@apollo/client';
 import { checkDocument, removeDirectivesFromDocument, hasDirectives, getOperationDefinition } from '@apollo/client/utilities';
 import { Observable } from 'zen-observable-ts';
 import GraphStore, { Action } from '@amoretto/action-graph';
+import GqlError from '../errors/gqlError.ts';
 import _ from 'lodash';
 
 const DIRECTIVE_NAME = 'action';
@@ -67,12 +68,23 @@ class QueueLink extends ApolloLink {
     return new Observable(observer => {
       const command = () => new Promise((resolve, reject) => {
         forward(operation).subscribe({
-          next: resolve,
+          next: result => {
+            if (result?.errors) {
+              console.log("errors on GQL");
+              reject(new GqlError(result));
+              return;
+            }
+            resolve(result);
+          },
           error: reject,
         });
       });
       const action = new Action(tags, dependencies, command);
       const subscription = action.subject.subscribe({
+        error: error => {
+          console.log('ERROR', error);
+          observer.error(error);
+        },
         complete: result => observer.complete && observer.complete(result),
         next: ({ error, result }) => {
           if (result?.errors) {
@@ -82,6 +94,10 @@ class QueueLink extends ApolloLink {
           if (result && observer.next) {
             console.log('SUCCESS');
             return observer.next(result);
+          }
+          if (error instanceof GqlError) {
+            console.log('NEW ERROR ON THE QUERY\'S RESULT');
+            return observer.next(error.result);
           }
           if (error && observer.error) {
             console.log('GENERAL ERROR');

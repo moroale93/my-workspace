@@ -21,9 +21,9 @@ export default class Graph extends Observable<GraphChanges> {
     public addNode(action: Action): void {
         action.subject.subscribe({
             complete: () => this.subject.next({ nodeDeleted: action.id }),
-        })
+        });
         this.statusManager.observeAction(action);
         new NodeExecutor(action, this.name);
-        this.subject.next({ nodeAdded: action.id })
+        this.subject.next({ nodeAdded: action.id });
     }
 }

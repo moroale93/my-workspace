@@ -18,7 +18,7 @@ const tags = [
 
 describe('Action', () => {
 	it('create an action', () => {
-		const command = jest.fn().mockResolvedValue('Ciao');
+		const command = jest.fn().mockResolvedValue('ciao');
 		const action = new Action(tags, dependencyTags, command);
 
 		expect(action.id).toBe('uuid');
@@ -50,27 +50,52 @@ describe('Action', () => {
 		expect(completeMock).toHaveBeenCalledTimes(1);
 	});
 
+	it('notifies on action without value', async () => {
+		const completeMock = jest.fn();
+		const nextMock = jest.fn();
+		const command = jest.fn().mockResolvedValue(undefined);
+		const action = new Action(tags, dependencyTags, command);
+		action.subject.subscribe({
+			complete: completeMock,
+			next: nextMock,
+		});
+
+		action.execute();
+		await wait(0);
+
+		expect(nextMock).toHaveBeenCalledTimes(2);
+		expect(nextMock).toHaveBeenNthCalledWith(1, {
+			actionId: action.id,
+		});
+		expect(nextMock).toHaveBeenNthCalledWith(2, {
+			actionId: action.id,
+			result: {},
+		});
+		expect(completeMock).toHaveBeenCalledTimes(1);
+	});
+
 	it('notifies on action error', async () => {
 		const completeMock = jest.fn();
 		const nextMock = jest.fn();
+		const errorMock = jest.fn();
 		const command = jest.fn().mockRejectedValue('Error');
 		const action = new Action(tags, dependencyTags, command);
-		action.subject.subscribe({
+		const subscriptions = action.subject.subscribe({
 			next: nextMock,
 			complete: completeMock,
+			error: errorMock,
 		});
 
 		action.execute();
 		await wait(0);
 
 		expect(completeMock).toHaveBeenCalledTimes(0);
-		expect(nextMock).toHaveBeenCalledTimes(2);
+		expect(errorMock).toHaveBeenCalledTimes(1);
+		expect(errorMock).toHaveBeenCalledWith('Error');
+		expect(nextMock).toHaveBeenCalledTimes(1);
 		expect(nextMock).toHaveBeenCalledWith({
 			actionId: 'uuid',
 		});
-		expect(nextMock).toHaveBeenCalledWith({
-			actionId: 'uuid',
-			error: 'Error',
-		});
+		subscriptions.unsubscribe();
 	});
 });

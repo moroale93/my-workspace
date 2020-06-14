@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import Observable from './Observable';
+import ActionCancelledError from './ActionCancelledError';
 
 export interface ActionChange {
     actionId: string
-    error?: any
     result?: any
 }
 
@@ -32,15 +32,16 @@ export default class Action extends Observable<ActionChange> {
             .then(result => {
                 this.subject.next({
                     actionId: this.id,
-                    result,
+                    result: result || {},
                 });
                 this.subject.complete();
             })
             .catch(e => {
-                this.subject.next({
-                    actionId: this.id,
-                    error: e,
-                });
+                this.subject.error(e);
             });
+    }
+
+    public cancel(): void {
+        this.subject.error(new ActionCancelledError(this.id));
     }
 }

@@ -11,6 +11,7 @@ export default class NodeExecutor {
     const blockingActions = action.blockingActionIds.map(actionId => actionStore.getAction(actionId));
     if (blockingActions.length) {
       blockingActions.forEach(blockingAction => blockingAction.subject.subscribe({
+        error: () => action.cancel(),
         complete: () => action.blockingActionIds = action.blockingActionIds.filter(id => id !== blockingAction.id),
       }));
       return forkJoin(blockingActions.map(blockingAction => blockingAction.subject.toPromise()))
