@@ -7,16 +7,16 @@ export default function AutosaveStatus() {
   const [errors, setErrors] = useState(Object.keys(GraphStore.getInstance().getGraph('test').statusManager.errors).length);
 
   useEffect(() => {
-    const statusManagerObservable = GraphStore.getInstance().getGraph('test').statusManager.subject;
-    statusManagerObservable.subscribe({
-      next: ({ status, cancellations, errors }) => {
-        setStatus(status);
-        setCancellations(cancellations);
-        setErrors(errors);
-      },
-    });
+    const statusSubscription = GraphStore.getInstance().getGraph('test')
+      .statusManager.subject.subscribe({
+        next: ({ status, cancellations, errors }) => {
+          setStatus(status);
+          setCancellations(cancellations);
+          setErrors(errors);
+        },
+      });
     return () => {
-      statusManagerObservable.unsubscribe();
+      statusSubscription.unsubscribe();
     };
   }, []);
 
